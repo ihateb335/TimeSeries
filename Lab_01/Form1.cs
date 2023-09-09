@@ -22,6 +22,11 @@ namespace Lab_01
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Обробник для завантаження вхідних даних з файлу
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadButton_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -42,6 +47,11 @@ namespace Lab_01
             DisplayLevelsButton_Click(sender, e);
         }
 
+        /// <summary>
+        /// Обробник для зберігання вихідних даних у файл
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SaveButton_Click(object sender, EventArgs e)
         {
             var dialog = new SaveFileDialog();
@@ -52,6 +62,12 @@ namespace Lab_01
             }
         }
 
+
+        /// <summary>
+        /// Обробник для перемикання мами у режим відображення рівнів
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DisplayLevelsButton_Click(object sender, EventArgs e)
         {
             // Clear any previous data from the chart
@@ -64,7 +80,7 @@ namespace Lab_01
             };
 
             // Add data points to the series
-            _timeSeries.timePoints.ForEach(point => series.Points.AddXY(point.T, point.Y));
+            _timeSeries.TimePoints.ForEach(point => series.Points.AddXY(point.T, point.Y));
 
 
             // Add the series to the chart
@@ -75,6 +91,11 @@ namespace Lab_01
             chart1.ChartAreas[0].AxisY.Title = "Levels";
         }
 
+        /// <summary>
+        /// Обробник для перемикання мами у режим відображення корреломапи
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CorrelationButton_Click(object sender, EventArgs e)
         {
             // Clear any previous data from the chart
