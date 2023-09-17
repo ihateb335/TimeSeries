@@ -37,12 +37,26 @@ namespace Time_Series
         /// <summary>
         /// Підрахунок дисперсії часового ряду
         /// </summary>
-        private void CalculateDispersion()
+        private void Initialize()
         {
             Expected = TimePoints.Sum(point => point.Y) / N;
             Dispersion = TimePoints.Sum(point => (point.Y - Expected) * (point.Y - Expected) ) / (N - 1);
-        }
 
+            double sy = Math.Sqrt(Dispersion);
+            IrvinAnomalies = new double[N - 1]
+                    .Select(
+                        (x, i) => Math.Abs(TimePoints[i + 1].Y - TimePoints[i].Y) / sy
+                        )
+                    .ToArray();
+        }
+        
+        /// <summary>
+        /// Get anomalies in series via Irvin's method
+        /// </summary>
+        public double[] IrvinAnomalies { get; private set; }
+       
+
+        #region Кореляційні коефіцієнти
         /// <summary>
         /// Підрахунок корреляційного коефіцієнту з лагом L
         /// </summary>
@@ -83,7 +97,9 @@ namespace Time_Series
                 CorrelationCoefs.Add(new TimePoint { T = i, Y = CalculateCorrelationCoefficient(i) });
             }
         }
+        #endregion
 
+        #region Зберігання даних
         /// <summary>
         /// Завантажити дані з файлу
         /// </summary>
@@ -93,7 +109,7 @@ namespace Time_Series
         /// <exception cref="InvalidOperationException">Помилка при десеріалізації</exception>
         public static TimeSeries Load(string filepath)
         {
-            if(!File.Exists(filepath)) 
+            if (!File.Exists(filepath))
                 throw new FileNotFoundException($"File {filepath} not found");
             try
             {
@@ -101,11 +117,14 @@ namespace Time_Series
                 string jsonContent = File.ReadAllText(filepath);
 
                 // Deserialize the JSON content into the timePoints list
-                var timePoints = JsonConvert.DeserializeObject<List<TimePoint>>(jsonContent);
+                var timePoints = JsonConvert
+                    .DeserializeObject<List<TimePoint>>(jsonContent)
+                    .Select((obj, i) => { obj.T = i; return obj; })
+                    .ToList();
 
                 var result = new TimeSeries { TimePoints = timePoints };
 
-                result.CalculateDispersion();
+                result.Initialize();
 
                 return result;
             }
@@ -147,6 +166,8 @@ namespace Time_Series
                 throw new InvalidOperationException($"Error serializing to JSON and saving to {filepath}: {ex.Message}");
             }
         }
+        #endregion
+
 
     }
 }
