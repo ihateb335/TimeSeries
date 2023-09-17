@@ -12,12 +12,10 @@ using Time_Series;
 
 namespace Lab_01
 {
-    public partial class Form1 : Form
+    public partial class Lab_01 : TimeSeriesForm
     {
 
-        private TimeSeries _timeSeries;
-        private const string FILES = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
-        public Form1()
+        public Lab_01()
         {
             InitializeComponent();
         }
@@ -29,22 +27,17 @@ namespace Lab_01
         /// <param name="e"></param>
         private void LoadButton_Click(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog();
-            dialog.Filter = FILES;
-            dialog.Title = "Open json files";
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                _timeSeries = TimeSeries.Load(dialog.FileName);
+            if( LoadTimeSeries())
+            { 
+                _timeSeries.CalculateCorrelationCoefficients(1, 8);
+
+                MY.Text = PrintDouble(_timeSeries.Expected);
+                DY.Text = PrintDouble(_timeSeries.Dispersion);
+
+
+                DisplayLevelsButton_Click(sender, e);
             }
 
-            string toStr(double str) => $"{ str ,0:F4}";
-
-            MY.Text = toStr(_timeSeries.Expected);
-            DY.Text = toStr(_timeSeries.Dispersion);
-
-            _timeSeries.CalculateCorrelationCoefficients(1, 8);
-
-            DisplayLevelsButton_Click(sender, e);
         }
 
         /// <summary>
@@ -54,12 +47,7 @@ namespace Lab_01
         /// <param name="e"></param>
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            var dialog = new SaveFileDialog();
-            dialog.Filter = FILES;
-            if(dialog.ShowDialog() == DialogResult.OK)
-            {
-                _timeSeries.SaveAllData(dialog.FileName);
-            }
+            SaveAll();
         }
 
 
@@ -104,11 +92,11 @@ namespace Lab_01
             // Create a new series for the data points
             var series = new Series("Time series correlation graph")
             {
-                ChartType = SeriesChartType.Bar // Use Point chart type to display individual data points
+                ChartType = SeriesChartType.FastLine // Use Point chart type to display individual data points
             };
 
             // Add data points to the series
-            _timeSeries.CorrelationCoefs.ForEach(point => series.Points.AddXY(point.T, point.Y));
+            _timeSeries.CorrelationCoefs.ForEach(point => series.Points.AddXY(point.T, Math.Abs(point.Y)));
 
             // Add the series to the chart
             chart1.Series.Add(series);
