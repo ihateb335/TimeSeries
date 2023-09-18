@@ -5,20 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Time_Series;
+using TimeSeriesLibrary;
 
 namespace Lab_01
 {
     public class TimeSeriesForm: Form
     {
-        protected TimeSeries _timeSeries;
         private const string FILES = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
 
-        protected string PrintDouble(double str) => $"{ str,0:F4}";
+        protected virtual string PrintDouble(double str) => $"{ str,0:F4}";
+        protected virtual string PrintDoubleFull(double str) => $"{ str}";
         /// <summary>
         /// Обробник для завантаження вхідних даних з файлу
         /// </summary>
-        protected bool LoadTimeSeries()
+        protected bool LoadFileDialog(Action<string> action)
         {
             var dialog = new OpenFileDialog();
             dialog.Filter = FILES;
@@ -26,7 +26,7 @@ namespace Lab_01
             bool result = dialog.ShowDialog() == DialogResult.OK;
             if (result)
             {
-                _timeSeries = TimeSeries.Load(dialog.FileName);
+                action(dialog.FileName);
             }
 
             return result;
@@ -35,7 +35,7 @@ namespace Lab_01
         /// <summary>
         /// Обробник для зберігання вихідних даних у файл
         /// </summary>
-        protected bool SaveTimeSeries(Action<string> action)
+        protected bool SaveFileDialog(Action<string> action)
         {
             var dialog = new SaveFileDialog();
             dialog.Filter = FILES;
@@ -45,8 +45,6 @@ namespace Lab_01
                 action(dialog.FileName);
             } return result;
         }
-
-        protected bool SaveAll() => SaveTimeSeries(filename => _timeSeries.SaveAllData(filename));
 
     }
 }

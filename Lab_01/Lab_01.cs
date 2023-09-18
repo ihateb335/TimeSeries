@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using Time_Series;
+
+using TimeSeriesLibrary;
 
 namespace Lab_01
 {
@@ -20,6 +21,8 @@ namespace Lab_01
             InitializeComponent();
         }
 
+        private CorrelationTimeSeries _timeSeries;
+
         /// <summary>
         /// Обробник для завантаження вхідних даних з файлу
         /// </summary>
@@ -27,9 +30,8 @@ namespace Lab_01
         /// <param name="e"></param>
         private void LoadButton_Click(object sender, EventArgs e)
         {
-            if( LoadTimeSeries())
+            if( LoadFileDialog(file => _timeSeries = new CorrelationTimeSeries(file, 1, 8) ) )
             { 
-                _timeSeries.CalculateCorrelationCoefficients(1, 8);
 
                 MY.Text = PrintDouble(_timeSeries.Expected);
                 DY.Text = PrintDouble(_timeSeries.Dispersion);
@@ -47,7 +49,7 @@ namespace Lab_01
         /// <param name="e"></param>
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            SaveAll();
+            SaveFileDialog(file => _timeSeries.Save(file));
         }
 
 

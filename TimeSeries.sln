@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Time Series", "Time Series\Time Series.csproj", "{2A810620-FC37-443E-BA68-EC0C475C3DB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSeriesLibrary", "Time Series\TimeSeriesLibrary.csproj", "{2A810620-FC37-443E-BA68-EC0C475C3DB5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Labs", "Lab_01\Labs.csproj", "{DCC54210-D68F-4243-A51B-37B4E9A2327D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSeriesLibraryTests", "TimeSeriesLibraryTests\TimeSeriesLibraryTests.csproj", "{2F2F4D59-BED4-4F1D-9592-971D17D681BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DCC54210-D68F-4243-A51B-37B4E9A2327D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCC54210-D68F-4243-A51B-37B4E9A2327D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCC54210-D68F-4243-A51B-37B4E9A2327D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F2F4D59-BED4-4F1D-9592-971D17D681BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F2F4D59-BED4-4F1D-9592-971D17D681BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F2F4D59-BED4-4F1D-9592-971D17D681BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F2F4D59-BED4-4F1D-9592-971D17D681BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

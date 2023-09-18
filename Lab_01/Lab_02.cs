@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using Time_Series;
+using TimeSeriesLibrary;
 
 namespace Lab_01
 {
@@ -18,16 +18,16 @@ namespace Lab_01
         {
             InitializeComponent();
         }
-
+        private AnomalousTimeSeries _timeSeries;
         private void button2_Click(object sender, EventArgs e)
         {
-            if(LoadTimeSeries())
+            if( LoadFileDialog(filepath => _timeSeries = new AnomalousTimeSeries(filepath) ) )
             {
                 double Ilim = IrvinData.Ilim(_timeSeries.N, IrvinAlpha.Alpha0_05);
 
                 textBox1.Text = _timeSeries.IrvinAnomalies
                     .Select((value, i) => (i: i + 2, value: value ))
-                    .Aggregate($"Ilim: {Ilim, 0:F2}",(before, current) => before + $"{current.i, 3:F0} {current.value} {(current.value > Ilim ? "Аномалія" : "")} \r\n");
+                    .Aggregate($"Ilim: {Ilim, 0:F2}\r\n",(before, current) => before + $"{current.i, 3:F0} {current.value} {(current.value > Ilim ? "Аномалія" : "")} \r\n");
                     ;
 
                 // Clear any previous data from the chart
@@ -55,7 +55,7 @@ namespace Lab_01
 
         private void button3_Click(object sender, EventArgs e)
         {
-            SaveAll();
+            SaveFileDialog(file => _timeSeries.Save(file));
         }
     }
 }

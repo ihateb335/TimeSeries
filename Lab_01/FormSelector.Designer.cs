@@ -30,6 +30,7 @@
         {
             this.Lab01 = new System.Windows.Forms.Button();
             this.Lab02 = new System.Windows.Forms.Button();
+            this.Lab03 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Lab01
@@ -52,11 +53,22 @@
             this.Lab02.UseVisualStyleBackColor = true;
             this.Lab02.Click += new System.EventHandler(this.Lab02_Click);
             // 
+            // Lab03
+            // 
+            this.Lab03.Location = new System.Drawing.Point(184, 25);
+            this.Lab03.Name = "Lab03";
+            this.Lab03.Size = new System.Drawing.Size(75, 23);
+            this.Lab03.TabIndex = 2;
+            this.Lab03.Text = "Lab_03";
+            this.Lab03.UseVisualStyleBackColor = true;
+            this.Lab03.Click += new System.EventHandler(this.Lab03_Click);
+            // 
             // FormSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(263, 273);
+            this.Controls.Add(this.Lab03);
             this.Controls.Add(this.Lab02);
             this.Controls.Add(this.Lab01);
             this.Name = "FormSelector";
@@ -69,5 +81,6 @@
 
         private System.Windows.Forms.Button Lab01;
         private System.Windows.Forms.Button Lab02;
+        private System.Windows.Forms.Button Lab03;
     }
 }

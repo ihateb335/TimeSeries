@@ -14,7 +14,7 @@ namespace Lab_01
     {
         private void ShowForm(Form form)
         {
-            form.ShowDialog();
+            form.Show();
         }
 
         public FormSelector()
@@ -25,5 +25,6 @@ namespace Lab_01
         private void Lab01_Click(object sender, EventArgs e) => ShowForm(new Lab_01());
         private void Lab02_Click(object sender, EventArgs e) => ShowForm(new Lab_02());
 
+        private void Lab03_Click(object sender, EventArgs e) => ShowForm(new Lab_03());
     }
 }
