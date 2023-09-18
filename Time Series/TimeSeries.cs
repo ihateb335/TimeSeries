@@ -4,20 +4,45 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using MathNet.Numerics.Distributions;
 
-namespace Time_Series
+namespace TimeSeriesLibrary
 {
     [Serializable]
     public class TimeSeries
     {
+        public TimeSeries(string filepath)
+        {
+            TimePoints = Load(filepath).ToList();
+            Setup();
+            Initialize();
+        }
+
+        public TimeSeries(IEnumerable<TimePoint> timePoints)
+        {
+            TimePoints = timePoints.ToList();
+            Setup();
+            Initialize();
+        }
+
+        private void Setup()
+        {
+            Expected = TimePoints.Sum(point => point.Y) / N;
+            Dispersion = TimePoints.Sum(point => (point.Y - Expected) * (point.Y - Expected)) / (N - 1);
+        }
+
+        protected virtual void Initialize()
+        {
+
+        }
+
+
         /// <summary>
         /// Рівні часового ряду
         /// </summary>
-        public List<TimePoint> TimePoints { get; private set; }
-        /// <summary>
-        /// Корреляційні коефіцієнти
-        /// </summary>
-        public List<TimePoint> CorrelationCoefs { get; private set; }
+        public List<TimePoint> TimePoints { get; internal set; }
+
+       
 
         /// <summary>
         /// Кількість рівнів часового ряду
@@ -34,124 +59,16 @@ namespace Time_Series
         /// </summary>
         public double Dispersion { get; private set; } = double.NaN;
 
-        /// <summary>
-        /// Підрахунок дисперсії часового ряду
-        /// </summary>
-        private void Initialize()
-        {
-            Expected = TimePoints.Sum(point => point.Y) / N;
-            Dispersion = TimePoints.Sum(point => (point.Y - Expected) * (point.Y - Expected) ) / (N - 1);
+  
 
-            double sy = Math.Sqrt(Dispersion);
-            IrvinAnomalies = new double[N - 1]
-                    .Select(
-                        (x, i) => Math.Abs(TimePoints[i + 1].Y - TimePoints[i].Y) / sy
-                        )
-                    .ToArray();
-        }
-        
-        /// <summary>
-        /// Get anomalies in series via Irvin's method
-        /// </summary>
-        public double[] IrvinAnomalies { get; private set; }
-       
-
-        #region Кореляційні коефіцієнти
-        /// <summary>
-        /// Підрахунок корреляційного коефіцієнту з лагом L
-        /// </summary>
-        /// <param name="L">Корреляційний лаг</param>
-        /// <returns>Коефіцієнт корреляції</returns>
-        /// <exception cref="ArgumentException">При перевищенні значення N лагом</exception>
-        public double CalculateCorrelationCoefficient(int L)
-        {
-            if (L > N) throw new ArgumentException("L is out of bounds");
-
-            double nl = N - L, yyLSum = 0, ySum = 0, yLSum = 0, y2Sum = 0, yL2Sum = 0, y = 0, yL = 0;
-
-            for (int i = 0; i < N - L; i++)
-            {
-                y = TimePoints[i].Y;
-                yL = TimePoints[i + L].Y;
-
-                yyLSum += y * yL;
-                ySum += y;
-                yLSum += yL;
-                y2Sum += y * y;
-                yL2Sum += yL * yL;
-            }
-
-            return (nl * yyLSum - ySum * yLSum) / Math.Sqrt(nl * y2Sum - ySum * ySum) / Math.Sqrt(nl * yL2Sum - yLSum * yLSum);
-        }
-
-        /// <summary>
-        /// Підрахування корреляційних коефіцієнтів
-        /// </summary>
-        /// <param name="min">Мінімальний кореляційний коефіцієнт</param>
-        /// <param name="max">Максимальний кореляційний коефіцієнт</param>
-        public void CalculateCorrelationCoefficients(int min, int max)
-        {
-            CorrelationCoefs = new List<TimePoint>();
-            for (int i = min; i <= max; i++)
-            {
-                CorrelationCoefs.Add(new TimePoint { T = i, Y = CalculateCorrelationCoefficient(i) });
-            }
-        }
-        #endregion
-
-        #region Зберігання даних
-        /// <summary>
-        /// Завантажити дані з файлу
-        /// </summary>
-        /// <param name="filepath">Шлях до даних</param>
-        /// <returns></returns>
-        /// <exception cref="FileNotFoundException">Файл не було знайдено</exception>
-        /// <exception cref="InvalidOperationException">Помилка при десеріалізації</exception>
-        public static TimeSeries Load(string filepath)
-        {
-            if (!File.Exists(filepath))
-                throw new FileNotFoundException($"File {filepath} not found");
-            try
-            {
-                // Read the JSON content from the file
-                string jsonContent = File.ReadAllText(filepath);
-
-                // Deserialize the JSON content into the timePoints list
-                var timePoints = JsonConvert
-                    .DeserializeObject<List<TimePoint>>(jsonContent)
-                    .Select((obj, i) => { obj.T = i; return obj; })
-                    .ToList();
-
-                var result = new TimeSeries { TimePoints = timePoints };
-
-                result.Initialize();
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Error deserializing JSON from {filepath}: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Зберегти значення рівнів поточного часового ряду
-        /// </summary>
-        /// <param name="filepath">Шлях до зберігання</param>
-        public void SaveTimePoints(string filepath) => Save(filepath, TimePoints);
-        /// <summary>
-        /// Зберегти всі дані поточного часового ряду
-        /// </summary>
-        /// <param name="filepath">Шлях до зберігання</param>
-        public void SaveAllData(string filepath) => Save(filepath, this);
-
+        #region Зберігання та завантаження
         /// <summary>
         /// Зберегти дані часового ряду
         /// </summary>
         /// <param name="filepath">Шлях до зберігання</param>
-        /// <param name="value">Що зберігати</param>
+        /// <param name="value">Дані для зберігання</param>
         /// <exception cref="InvalidOperationException"></exception>
-        protected void Save(string filepath, object value)
+        public static void Save(string filepath, object value)
         {
             try
             {
@@ -166,8 +83,40 @@ namespace Time_Series
                 throw new InvalidOperationException($"Error serializing to JSON and saving to {filepath}: {ex.Message}");
             }
         }
-        #endregion
+        /// <summary>
+        /// Зберегти дані часового ряду
+        /// </summary>
+        /// <param name="filepath"></param>
+        public void Save(string filepath) => Save(filepath, this);
 
+        /// <summary>
+        /// Завантажити дані з файлу
+        /// </summary>
+        /// <param name="filepath">Шлях до даних</param>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException">Файл не було знайдено</exception>
+        /// <exception cref="InvalidOperationException">Помилка при десеріалізації</exception>
+        private static IEnumerable<TimePoint> Load(string filepath)
+        {
+            if (!File.Exists(filepath))
+                throw new FileNotFoundException($"File {filepath} not found");
+            try
+            {
+                // Read the JSON content from the file
+                string jsonContent = File.ReadAllText(filepath);
+
+                // Deserialize the JSON content into the timePoints list
+                return JsonConvert
+                    .DeserializeObject<List<TimePoint>>(jsonContent)
+                    .Select((obj, i) => { obj.T = i; return obj; })
+                    ;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Error deserializing JSON from {filepath}: {ex.Message}");
+            }
+        }
+        #endregion
 
     }
 }
